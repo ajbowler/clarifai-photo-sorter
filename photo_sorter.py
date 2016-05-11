@@ -31,15 +31,21 @@ top_five_tags = []
 for i in top_five_tuples:
     top_five_tags.append(i[0])
 
+os.makedirs('album/misc/')
 for tag in top_five_tags:
     dir_name = 'album/' + tag + '/'
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
+found_dir = False
 for i in range(0, len(image_tag_lists)):
     for tag in image_tag_lists[i]:
         if tag in top_five_tags:
             src = user_path + image_paths[i]
             dst = "album/" + tag + '/'
             copy(str(src), str(dst))
+            found_dir = True
             break;
+    if not found_dir:
+        copy(str(src), str('album/misc/'))
+
