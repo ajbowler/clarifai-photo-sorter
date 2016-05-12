@@ -61,4 +61,11 @@ for i in range(0, len(image_tag_lists)):
     cur = str(i + 1)
     print cur + ' out of ' + str(len(image_tag_lists)) + ' images sorted...'
 
+print '\nCleaning empty directories...\n'
+album_dir_list = os.listdir('album/')
+for directory in album_dir_list:
+    sub_dir = 'album/' + directory + '/'
+    if len(os.listdir(sub_dir)) == 0:
+        os.rmdir(sub_dir)
+
 print '\nAll images sorted. Check the album directory for your newly sorted images!\n'
