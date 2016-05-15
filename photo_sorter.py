@@ -3,30 +3,36 @@ from shutil import copy
 import json
 import operator
 import os
+import sys
 
 # histogram that records how many instances of each tag there are
 tag_histogram = {}
 # a list of list of the tags each image has
 image_tag_lists = []
-clarifai_api = ClarifaiApi() # assumes environment variables are set.
+clarifai_api = ClarifaiApi()
 
-# user enters the path to the album they want to sort
-user_path = raw_input("Please enter path of photo library: ")
-print '\n'
+# improper usage
+if len(sys.argv) < 2:
+    print '\nUsage:\n\t python photo_sorter.py <original photo directory>'
+    exit()
+
+orig_photo_dir = sys.argv[1]
+if orig_photo_dir[len(orig_photo_dir) - 1] != '/':
+    orig_photo_dir += '/'
 
 # safe gaurd for if we can't find the album
-if not os.path.exists(user_path):
-    print("Path does not exist")
+if not os.path.exists(orig_photo_dir):
+    print "\nPath does not exist"
     exit()
 
 # list of all of the files stored in the user's given path
-image_paths = os.listdir(user_path)
+image_paths = os.listdir(orig_photo_dir)
 
 print 'Begin processing images...\n'
 # iterates through each file in the user's given path
 for path in range(0, len(image_paths)):
     # a list of all of the tags in the current file we are in
-    result = clarifai_api.tag_images(open(user_path + image_paths[path], 'rb'))['results'][0]['result']['tag']['classes']
+    result = clarifai_api.tag_images(open(orig_photo_dir + image_paths[path], 'rb'))['results'][0]['result']['tag']['classes']
     # add this list to or lists of tag lists
     image_tag_lists.append(result)
     # add the tag to our histogram if it isn't there or increment it by one if it is
@@ -59,6 +65,7 @@ for tag in top_five_tags:
     dir_name = 'album/' + tag + '/'
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
+
 # a boolean that is set to true when it fits into one of our tag folders.
 # At the end of checking all folders, we will check found_dir, if it is still
 # false (meaning the image could not fit), the image will be sent to misc.
